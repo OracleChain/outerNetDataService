@@ -14,6 +14,8 @@
 #define STATUS_DEALED 1
 #define URL_CANNOT_ACCESS 2
 
+#define LIMITED_ONLY_ADMIN_CAN_DO "6000000 PERMISSION LIMITED_ONLY_ADMIN_CAN_DO" //参数错误
+#define ID_NOT_EXIST "6000001 ID_NOT_EXIST" //参数错误
 /*
 @abi action addwebreq
 */
@@ -38,8 +40,16 @@ struct webresult{
     uint64_t id;
     std::string webdata;
     uint32_t status;
-    account_name resfrom;
-    EOSLIB_SERIALIZE(webresult, (id)(webdata)(status)(resfrom))
+    std::string errmsg;
+    EOSLIB_SERIALIZE(webresult, (id)(webdata)(status)(errmsg))
+};
+
+/*
+@abi action clearall
+*/
+struct clear{
+    std::string debug;
+    EOSLIB_SERIALIZE(clear, (debug))
 };
 
 /*
@@ -55,8 +65,7 @@ struct web{
     uint32_t status;
     std::string memo;
 
-    std::string webdata;
-    account_name resfrom;
+
 
     uint64_t primary_key()const { return id;}
     account_name get_secondary()const { return from; }
@@ -71,9 +80,20 @@ struct web{
         this->memo = p.memo;
     }
 
-    EOSLIB_SERIALIZE(web, (id)(from)(url)(postdata)(method)(requesttimestamp)(status)(memo)(webdata)(resfrom))
+    EOSLIB_SERIALIZE(web, (id)(from)(url)(postdata)(method)(requesttimestamp)(status)(memo)(webdata)(errmsg)(releasetime))
 };
 
+/*
+@abi table webres
+*/
+struct webres{
+    uint64_t id;
+    std::string webdata;
+    std::string errmsg;
+    uint64_t releasetime;
+
+    EOSLIB_SERIALIZE(webres, (id)(webdata)(errmsg)(releasetime))
+};
 
 class OutNetDataSer{
 public:
@@ -81,6 +101,7 @@ public:
 
     void storeWebResult(const webresult & parwebresult);
 
+    void clearall(const clear & c);
     const uint64_t admin = N(ondsadmin);
 
     const uint64_t contractCode = N(outnetserver);
@@ -90,3 +111,5 @@ public:
 
 typedef eosio::multi_index<N(web), web,
    eosio::indexed_by< N(bysecondary), eosio::const_mem_fun<web,  account_name, &web::get_secondary> >> ReqWebTable;
+
+typedef eosio::multi_index<N(webres), webres> MultiIndexWebRes;

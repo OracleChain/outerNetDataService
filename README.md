@@ -14,6 +14,16 @@ cleos -u http://127.0.0.1:8889/ --wallet-url http://127.0.0.1:8890/ wallet impor
 
 cleos -u http://127.0.0.1:8889/ --wallet-url http://127.0.0.1:8890/ create account eosio outnetserver EOS8gb6EkQDry72Ugwwy6MUZCr7EQ4ytGAeRhu3knVsA3qSneWPEb EOS6BB3rfssiBdiBN2d14GQLswcM1KBmcKWEM8fiSmdLw6eKWP5et
 cleos -u http://127.0.0.1:8889/ --wallet-url http://127.0.0.1:8890/ create account eosio ondsadmin EOS8gb6EkQDry72Ugwwy6MUZCr7EQ4ytGAeRhu3knVsA3qSneWPEb EOS6BB3rfssiBdiBN2d14GQLswcM1KBmcKWEM8fiSmdLw6eKWP5et
-
-
 cleos  -u http://127.0.0.1:8889/ --wallet-url http://127.0.0.1:8890/  set contract outnetserver ./ outerNetDataService.wast outerNetDataService.abi -p outnetserver
+
+
+cleos  -u http://127.0.0.1:8889/ --wallet-url http://127.0.0.1:8890/  push action  outnetserver addwebreq '{"from":"outnetserver", "url":"http://www.baidu.com", "postdata":"", "method":"0", "requesttimestamp":0, "memo":"m"}' -p outnetserver
+
+cleos  -u http://127.0.0.1:8889/ --wallet-url http://127.0.0.1:8890/  get table outnetserver ondsadmin outweb
+
+!@#$%^&*()_+{}:>?
+
+cleos  -u http://127.0.0.1:8889/ --wallet-url http://127.0.0.1:8890/  push action  outnetserver addwebres '{"id":"1", "webdata":"", "status":"1", "errmsg":"url not accessed at that time"}' -p ondsadmin
+
+
+cleos  -u http://127.0.0.1:8889/ --wallet-url http://127.0.0.1:8890/  push action  outnetserver clearall '{"debug":"yes"}' -p ondsadmin

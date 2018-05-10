@@ -6,12 +6,16 @@
 
 void OutNetDataSer::storeWebRequest(const webrequest & parrequestweb){
     ReqWebTable tfs(contractCode, admin);
+    require_auth(parrequestweb.from);
     auto ite = tfs.rbegin();
 
     uint64_t idnew;
-    if(ite == tfs.rend()){
+    if(ite == tfs.rend())
+    {
         idnew = 0;
-    }else{
+    }
+    else
+    {
         idnew = ite->primary_key()+1;
     }
 
@@ -24,7 +28,36 @@ void OutNetDataSer::storeWebRequest(const webrequest & parrequestweb){
 }
 
 void OutNetDataSer::storeWebResult(const webresult & parwebresult){
+    require_auth(admin);
+    ReqWebTable tfs(contractCode, admin);
+    MultiIndexWebRes miwr(contractCode, admin);
 
+    auto webIte = tfs.find(parwebresult.id);
+    eosio_assert(webIte != tfs.end(), ID_NOT_EXIST);
+    auto webresIte = miwr.find(parwebresult.id);
+    if(webresIte == miwr.end()){
+        miwr.emplace(admin, [&](auto &s){
+            s.id =      parwebresult.id;
+            s.webdata = parwebresult.webdata;
+            s.errmsg = parwebresult.errmsg;
+            s.status = parwebresult.status;
+        });
+    }else{
+        miwr.modify(webIte, admin, [&](auto &s){
+                   s.webdata = parwebresult.webdata;
+                   s.errmsg = parwebresult.errmsg;
+                   s.status = parwebresult.status;
+            });
+    }
+}
+
+void OutNetDataSer::clearall(const clear & c){
+    require_auth(admin);
+    ReqWebTable tfs(contractCode, admin);
+    auto ite = tfs.begin();
+    while(ite!=tfs.end()){
+        ite = tfs.erase(ite);
+    }
 }
 
 /**
@@ -49,6 +82,10 @@ extern "C" {
                 break;
             }
 
+        case N(clear):{
+            OutNetDataSer().clearall(eosio::unpack_action_data<clear>());
+                break;
+            }
         default:
             break;
     }

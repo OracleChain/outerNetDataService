@@ -4,8 +4,8 @@
  */
 #include "outerNetDataService.hpp"
 
-void OuterNetDataService::storeRequestWeb(const requestweb & parrequestweb){
-    RequestWebTable tfs(contractCode, admin);
+void OutNetDataSer::storeWebRequest(const webrequest & parrequestweb){
+    ReqWebTable tfs(contractCode, admin);
     auto ite = tfs.rbegin();
 
     uint64_t idnew;
@@ -15,12 +15,16 @@ void OuterNetDataService::storeRequestWeb(const requestweb & parrequestweb){
         idnew = ite->primary_key()+1;
     }
 
-    requestwebt newrequestwebt;
-    newrequestwebt.id = idnew;
-    newrequestwebt.copyFrom(parrequestweb);
+    web newweb;
+    newweb.id = idnew;
+    newweb.copyFrom(parrequestweb);
     tfs.emplace(parrequestweb.from, [&](auto &s){
-        s = newrequestwebt;
+        s = newweb;
     });
+}
+
+void OutNetDataSer::storeWebResult(const webresult & parwebresult){
+
 }
 
 /**
@@ -34,9 +38,14 @@ extern "C" {
     void apply( uint64_t receiver, uint64_t code, uint64_t action ) {
         switch(action)
         {
-            case N(add):
+            case N(addwebreq):
             {
-                OuterNetDataService().storeRequestWeb( eosio::unpack_action_data<requestweb>() );
+                OutNetDataSer().storeWebRequest(eosio::unpack_action_data<webrequest>());
+                break;
+            }
+            case N(addwebres):
+            {
+                OutNetDataSer().storeWebResult(eosio::unpack_action_data<webresult>());
                 break;
             }
 

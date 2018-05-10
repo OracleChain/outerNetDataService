@@ -15,9 +15,9 @@
 #define URL_CANNOT_ACCESS 2
 
 /*
-@abi action add
+@abi action addwebreq
 */
-struct requestweb{
+struct webrequest{
     account_name  from;//must be one contract
     std::string url;
     std::string postdata;//post method parameter
@@ -27,13 +27,25 @@ struct requestweb{
 
     account_name primary_key()const { return from;}
 
-    EOSLIB_SERIALIZE(requestweb, (from)(url)(postdata)(method)(requesttimestamp)(memo))
+    EOSLIB_SERIALIZE(webrequest, (from)(url)(postdata)(method)(requesttimestamp)(memo))
+};
+
+
+/*
+@abi action addwebres
+*/
+struct webresult{
+    uint64_t id;
+    std::string webdata;
+    uint32_t status;
+    account_name resfrom;
+    EOSLIB_SERIALIZE(webresult, (id)(webdata)(status)(resfrom))
 };
 
 /*
-@abi table
+@abi table web
 */
-struct requestwebt{
+struct web{
     uint64_t id;
     account_name  from;//must be one contract
     std::string url;
@@ -43,10 +55,13 @@ struct requestwebt{
     uint32_t status;
     std::string memo;
 
+    std::string webdata;
+    account_name resfrom;
+
     uint64_t primary_key()const { return id;}
     account_name get_secondary()const { return from; }
 
-    void copyFrom(const requestweb & p){
+    void copyFrom(const webrequest & p){
         this->from = p.from;
         this->url = p.url;
         this->postdata = p.postdata;
@@ -56,12 +71,15 @@ struct requestwebt{
         this->memo = p.memo;
     }
 
-    EOSLIB_SERIALIZE(requestwebt, (id)(from)(url)(postdata)(method)(requesttimestamp)(status)(memo))
+    EOSLIB_SERIALIZE(web, (id)(from)(url)(postdata)(method)(requesttimestamp)(status)(memo)(webdata)(resfrom))
 };
 
-class OuterNetDataService{
+
+class OutNetDataSer{
 public:
-    void storeRequestWeb(const requestweb & parrequestweb);
+    void storeWebRequest(const webrequest & parrequestweb);
+
+    void storeWebResult(const webresult & parwebresult);
 
     const uint64_t admin = N(ondsadmin);
 
@@ -70,5 +88,5 @@ public:
 
 
 
-typedef eosio::multi_index<N(requestwebt), requestwebt,
-   eosio::indexed_by< N(bysecondary), eosio::const_mem_fun<requestwebt,  account_name, &requestwebt::get_secondary> >> RequestWebTable;
+typedef eosio::multi_index<N(web), web,
+   eosio::indexed_by< N(bysecondary), eosio::const_mem_fun<web,  account_name, &web::get_secondary> >> ReqWebTable;

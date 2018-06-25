@@ -80,7 +80,7 @@ struct web{
         this->memo = p.memo;
     }
 
-    EOSLIB_SERIALIZE(web, (id)(from)(url)(postdata)(method)(requesttimestamp)(status)(memo)(webdata)(errmsg)(releasetime))
+    EOSLIB_SERIALIZE(web, (id)(from)(url)(postdata)(method)(requesttimestamp)(status)(memo))
 };
 
 /*
@@ -91,6 +91,8 @@ struct webres{
     std::string webdata;
     std::string errmsg;
     uint64_t releasetime;
+
+    uint64_t primary_key()const  { return id; }
 
     EOSLIB_SERIALIZE(webres, (id)(webdata)(errmsg)(releasetime))
 };

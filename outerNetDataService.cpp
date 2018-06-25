@@ -40,13 +40,13 @@ void OutNetDataSer::storeWebResult(const webresult & parwebresult){
             s.id =      parwebresult.id;
             s.webdata = parwebresult.webdata;
             s.errmsg = parwebresult.errmsg;
-            s.status = parwebresult.status;
+            //s.status = parwebresult.status;
         });
     }else{
-        miwr.modify(webIte, admin, [&](auto &s){
+        miwr.modify(webresIte, admin, [&](auto &s){
                    s.webdata = parwebresult.webdata;
                    s.errmsg = parwebresult.errmsg;
-                   s.status = parwebresult.status;
+                   //s.status = parwebresult.status;
             });
     }
 }
@@ -82,8 +82,9 @@ extern "C" {
                 break;
             }
 
-        case N(clear):{
-            OutNetDataSer().clearall(eosio::unpack_action_data<clear>());
+            case N(clear):
+            {
+                OutNetDataSer().clearall(eosio::unpack_action_data<clear>());
                 break;
             }
         default:
